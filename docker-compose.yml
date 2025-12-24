@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  api-gateway:
+    build: ./services/api-gateway
+    ports: ["8080:8080"]
+    environment:
+      NOTE_SERVICE_ADDR: note-service:50051
+      TAG_SERVICE_ADDR: tag-service:50051
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+
+  note-service:
+    build: ./services/note-service
+    environment:
+      DATABASE_URL: postgres://noteuser:notepass@postgres-note:5432/notedb
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on: [postgres-note, rabbitmq]
+
+  tag-service:
+    build: ./services/tag-service
+    environment:
+      DATABASE_URL: postgres://taguser:tagpass@postgres-tag:5432/tagdb
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on: [postgres-tag, rabbitmq]
+
+  postgres-note:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: notedb
+      POSTGRES_USER: noteuser
+      POSTGRES_PASSWORD: notepass
+
+  postgres-tag:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: tagdb
+      POSTGRES_USER: taguser
+      POSTGRES_PASSWORD: tagpass
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports: ["5672:5672", "15672:15672"]  # AMQP + Admin UI
