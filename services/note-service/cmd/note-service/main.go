@@ -8,7 +8,10 @@ import (
 )
 
 func main() {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	pg, err := db.NewPostgres(cfg)
 	if err != nil {
