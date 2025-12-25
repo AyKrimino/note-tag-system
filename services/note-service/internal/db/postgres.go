@@ -14,6 +14,7 @@ type Postgres struct {
 	db *sql.DB
 }
 
+// NewPostgres creates a new connection to the database
 func NewPostgres(config config.Config) (*Postgres, error) {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
@@ -26,11 +27,11 @@ func NewPostgres(config config.Config) (*Postgres, error) {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
 	return &Postgres{
@@ -38,6 +39,7 @@ func NewPostgres(config config.Config) (*Postgres, error) {
 	}, nil
 }
 
+// Close closes the connection to the database
 func (p *Postgres) Close() error {
 	return p.db.Close()
 }

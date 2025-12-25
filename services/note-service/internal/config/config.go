@@ -2,7 +2,7 @@
 package config
 
 import (
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -26,7 +26,7 @@ type Config struct {
 func Load() (Config, error) {
 	err := godotenv.Load()
 	if err != nil {
-		return Config{}, err
+		return Config{}, fmt.Errorf("failed to load environment variables: %w", err)
 	}
 
 	dbCfg := DatabaseConfig{
