@@ -1,3 +1,5 @@
 module github.com/AyKrimino/note-tag-system/note-service
 
 go 1.25.5
+
+require github.com/lib/pq v1.10.9

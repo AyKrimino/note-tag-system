@@ -1,7 +1,18 @@
 package main
 
-import "fmt"
+import (
+	"log"
+
+	"github.com/AyKrimino/note-tag-system/note-service/internal/config"
+	"github.com/AyKrimino/note-tag-system/note-service/internal/db"
+)
 
 func main() {
-	fmt.Println("hello world")
+	cfg := config.Load()
+
+	pg, err := db.NewPostgres(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer pg.Close()
 }
