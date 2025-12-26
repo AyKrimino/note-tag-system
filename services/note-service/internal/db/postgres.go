@@ -43,3 +43,8 @@ func NewPostgres(config config.Config) (*Postgres, error) {
 func (p *Postgres) Close() error {
 	return p.db.Close()
 }
+
+// DB returns the database connection
+func (p *Postgres) DB() *sql.DB {
+	return p.db
+}
