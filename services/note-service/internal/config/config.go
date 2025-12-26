@@ -20,6 +20,8 @@ type DatabaseConfig struct {
 // Config contains the configuration for the application
 type Config struct {
 	Database DatabaseConfig
+
+	Env string
 }
 
 // Load returns the configuration
@@ -32,13 +34,15 @@ func Load() (Config, error) {
 	dbCfg := DatabaseConfig{
 		Host:     getenv("DB_HOST", "localhost"),
 		Port:     getenv("DB_PORT", "5432"),
-		User:     getenv("DB_USER", "_note_user"),
-		Password: getenv("DB_PASSWORD", "_note_password"),
-		Name:     getenv("DB_NAME", "_note_service"),
+		User:     getenv("DB_USER", "note_user"),
+		Password: getenv("DB_PASSWORD", "note_password"),
+		Name:     getenv("DB_NAME", "note_service"),
 	}
 
 	return Config{
 		Database: dbCfg,
+
+		Env: getenv("ENV", "development"),
 	}, nil
 }
 

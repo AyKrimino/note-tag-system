@@ -2,6 +2,7 @@ package main
 
 import (
 	"log/slog"
+	"os"
 
 	"github.com/AyKrimino/note-tag-system/note-service/internal/config"
 	"github.com/AyKrimino/note-tag-system/note-service/internal/db"
@@ -11,16 +12,20 @@ import (
 )
 
 func main() {
-	log := logger.New()
+	bootstrapLogger := logger.Bootstrap()
 
 	cfg, err := config.Load()
 	if err != nil {
-		log.Error("failed to load config", slog.Any("error", err))
+		bootstrapLogger.Error("failed to load config", slog.Any("error", err))
+		os.Exit(1)
 	}
+
+	log := logger.New(cfg.Env)
 
 	pg, err := db.NewPostgres(cfg)
 	if err != nil {
 		log.Error("failed to connect to database", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	log.Info("connected to database")
