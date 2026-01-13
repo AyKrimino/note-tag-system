@@ -1,0 +1,30 @@
+syntax = "proto3";
+package note;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = ".";
+
+message GetNoteRequest {
+  int64 id = 1;
+}
+
+message CreateNoteRequest {
+  string title = 1;
+  string content = 2;
+  repeated string tags = 3;
+}
+
+message NoteResponse {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  repeated string tags = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+service NoteService {
+  rpc GetNote (GetNoteRequest) returns (NoteResponse);
+  rpc CreateNote (CreateNoteRequest) returns (NoteResponse);
+}
