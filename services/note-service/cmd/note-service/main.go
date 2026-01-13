@@ -1,17 +1,16 @@
 package main
 
 import (
-	"context"
 	"log/slog"
+	"net"
 	"os"
-	"time"
 
 	"github.com/AyKrimino/note-tag-system/note-service/internal/config"
 	"github.com/AyKrimino/note-tag-system/note-service/internal/db"
-	"github.com/AyKrimino/note-tag-system/note-service/internal/domain"
 	"github.com/AyKrimino/note-tag-system/note-service/internal/logger"
 	"github.com/AyKrimino/note-tag-system/note-service/internal/repository"
 	"github.com/AyKrimino/note-tag-system/note-service/internal/service"
+	"github.com/AyKrimino/note-tag-system/note-service/internal/transport/grpc"
 )
 
 func main() {
@@ -34,26 +33,20 @@ func main() {
 
 	log.Info("connected to database")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
 	// TODO: remove this after creating handlers
 	noteRepo := repository.NewPostgresNoteRepository(pg.DB())
 	noteSvc := service.NewNoteService(noteRepo, log)
 
-	err = noteSvc.Create(ctx, &domain.Note{
-		Title:   "Title",
-		Content: "Content",
-		Tags:    []string{"tag1", "tag2"},
-	})
+	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {
-		log.Error("failed to create note", slog.Any("error", err))
+		log.Error("failed to listen", slog.Any("error", err))
+		os.Exit(1)
 	}
 
-	n, err := noteSvc.GetByID(ctx, 1)
-	if err != nil {
-		log.Error("failed to get note", slog.Any("error", err))
-	}
+	grpcServer := grpc.NewGRPCServer(noteSvc, log)
 
-	log.Info("got note", slog.Any("note", n))
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Error("failed to serve", slog.Any("error", err))
+		os.Exit(1)
+	}
 }

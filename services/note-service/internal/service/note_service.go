@@ -9,6 +9,11 @@ import (
 	"github.com/AyKrimino/note-tag-system/note-service/internal/repository"
 )
 
+type NoteService interface {
+	GetByID(ctx context.Context, id int) (*domain.Note, error)
+	Create(ctx context.Context, note *domain.Note) error
+}
+
 // noteService is the service for the notes
 type noteService struct {
 	repo repository.NoteRepository
@@ -20,7 +25,7 @@ type noteService struct {
 func NewNoteService(repo repository.NoteRepository, log *slog.Logger) *noteService {
 	return &noteService{
 		repo: repo,
-		log: log,
+		log:  log,
 	}
 }
 
